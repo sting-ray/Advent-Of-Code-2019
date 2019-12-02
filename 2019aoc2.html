@@ -1,0 +1,102 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+function challenge1() {
+	var input = document.getElementById("input").value.split(",");
+	//make the input numbers and not strings, really javascript...
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var pointer = 0; // To track where we are up to in the opcode
+	var stop = false;
+	
+	//make the extra changes to set values in input as per question...
+	input[1] = 12;
+	input[2] = 2;
+	
+	do {
+		if (input[pointer] == 1) {
+			input[input[pointer+3]] = input[input[pointer+1]] + input[input[pointer+2]];
+			pointer = pointer + 4
+		}
+
+		else if (input[pointer] == 2) {
+			input[input[pointer+3]] = input[input[pointer+1]] * input[input[pointer+2]];
+			pointer = pointer + 4
+		}
+		
+		else if (input[pointer] == 99) {
+			stop = true;
+		}
+		else {
+			stop = true;
+			input = "error: " + input;
+		}
+	}
+	while (stop == false);
+	
+	document.getElementById("challenge1").innerHTML = input;
+}
+
+
+
+function challenge2() {
+	var input = document.getElementById("input").value.split(",");
+	//make the input numbers and not strings, really javascript...
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var pointer = 0; // To track where we are up to in the opcode
+	var stop = false;
+	var result = "";
+	
+	//make the extra changes to set values in input as per question...
+	input[1] = 12;
+	input[2] = 2;
+
+	do {
+		if (input[pointer] == 1) {
+			input[input[pointer+3]] = input[input[pointer+1]] + input[input[pointer+2]];
+			if ([input[pointer+3]] == 19690720) {
+				result = "Found with addition: ";
+				stop = true;
+			}
+			else {
+				pointer = pointer + 4;
+			}
+		}
+
+		else if (input[pointer] == 2) {
+			input[input[pointer+3]] = input[input[pointer+1]] * input[input[pointer+2]];
+			if ([input[pointer+3]] == 19690720) {
+				result = "Found with multiplication: ";
+				stop = true;
+			}
+			else {
+				pointer = pointer + 4;
+			}
+		}
+		
+		else if (input[pointer] == 99) {
+			result = "Terminated before found: ";
+			stop = true;
+		}
+		else {
+			stop = true;
+			result = "error: " + input;
+		}
+	}
+	while (stop == false);
+	
+	//var result = 100 * input[input[pointer+1]] + input[input[pointer+2]];
+	//201 is too low
+	result = result + pointer;
+	
+	
+	document.getElementById("challenge2").innerHTML = result;
+}
+
+</script>
