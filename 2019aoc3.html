@@ -1,0 +1,554 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+
+//this code demonstrates why functions are so useful, by not using them, at all.
+
+function challenge1() {
+	//tastey variables
+	var wires = document.getElementById("input").value.split("\n");
+	var wire1 = wires[0].split(",");
+	var wire2 = wires[1].split(",");
+	//matrix[x][y] = value, 0 nothing, 1 wire1, 2 wire2, 3 both wires, 4 hub
+	var matrix = [[]];
+	//matrix[0][0] = 4;
+	var result = [];
+	var resultX = 0;
+	var resultY = 0;
+	var resultL = 0;
+
+	//where are we?
+	var pointerX = 10000;
+	var pointerY = 10000;
+	
+	//Mapping out wire1
+	//loop through each wire instrustion
+	for (i = 0; i < wire1.length; i++) { 
+	
+		//going right
+		if (wire1[i].charAt(0) == "R") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				matrix[pointerX][pointerY] = 1;
+				console.log("going right");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going left
+		if (wire1[i].charAt(0) == "L") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				matrix[pointerX][pointerY] = 1;
+				console.log("going left");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going down
+		if (wire1[i].charAt(0) == "D") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				pointerY++;
+				matrix[pointerX][pointerY] = 1;
+				console.log("going down");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going up
+		if (wire1[i].charAt(0) == "U") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				pointerY--;
+				matrix[pointerX][pointerY] = 1;
+				console.log("going up");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+	}
+	
+	//now let's loop through wire 2
+	//resetting points first
+	pointerX = 10000;
+	pointerY = 10000;
+	
+	//similar to before, but this time we check each point to see if we have overlaped.
+	for (i = 0; i < wire2.length; i++) { 
+	
+		//going right
+		if (wire2[i].charAt(0) == "R") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going right");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going left
+		if (wire2[i].charAt(0) == "L") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going left");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going down
+		if (wire2[i].charAt(0) == "D") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerY++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going down");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going up
+		if (wire2[i].charAt(0) == "U") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerY--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going up");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+	}
+
+	
+	document.getElementById("challenge1").innerHTML = result;
+}
+
+//-----------------------------------------------------
+
+function challenge2() {
+	var input = document.getElementById("input").value;
+	//tastey variables
+	var wires = document.getElementById("input").value.split("\n");
+	var wire1 = wires[0].split(",");
+	var wire2 = wires[1].split(",");
+	//matrix[x][y] = value, 0 nothing, 1 wire1, 2 wire2, 3 both wires, 4 hub
+	var matrix = [[]];
+	//matrix[0][0] = 4;
+	var result = [];
+	var resultX = 0;
+	var resultY = 0;
+	var resultL = 0;
+
+	//where are we?
+	var pointerX = 10000;
+	var pointerY = 10000;
+	
+	//Mapping out wire1
+	//loop through each wire instrustion
+	for (i = 0; i < wire1.length; i++) { 
+	
+		//going right
+		if (wire1[i].charAt(0) == "R") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				matrix[pointerX][pointerY] = 1;
+				console.log("going right");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going left
+		if (wire1[i].charAt(0) == "L") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				matrix[pointerX][pointerY] = 1;
+				console.log("going left");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going down
+		if (wire1[i].charAt(0) == "D") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				pointerY++;
+				matrix[pointerX][pointerY] = 1;
+				console.log("going down");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going up
+		if (wire1[i].charAt(0) == "U") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				pointerY--;
+				matrix[pointerX][pointerY] = 1;
+				console.log("going up");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+	}
+	
+	//now let's loop through wire 2
+	//resetting points first
+	pointerX = 10000;
+	pointerY = 10000;
+	
+	//similar to before, but this time we check each point to see if we have overlaped.
+	for (i = 0; i < wire2.length; i++) { 
+	
+		//going right
+		if (wire2[i].charAt(0) == "R") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going right");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going left
+		if (wire2[i].charAt(0) == "L") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerX--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going left");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going down
+		if (wire2[i].charAt(0) == "D") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerY++;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going down");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+		
+		//going up
+		if (wire2[i].charAt(0) == "U") {
+			length = wire2[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerY--;
+				if (Array.isArray(matrix[pointerX]) == false) {
+					matrix[pointerX] = [];
+				}
+				//if point not crossed, then tell it, this is where wire 2 goes
+				if (matrix[pointerX][pointerY] == null) {
+					matrix[pointerX][pointerY] = 2;
+				}
+				if (matrix[pointerX][pointerY] == 1) {
+					matrix[pointerX][pointerY] = 3;
+					//calculate lengths on a crossover
+					if (pointerX > 10000) {
+						resultL = pointerX - 10000;
+					}
+					else {
+						resultL = 10000 - pointerX;
+					}
+					if (pointerY > 10000) {
+						resultL = resultL + pointerY - 10000;
+					}
+					else {
+						resultL = resultL + 10000 - pointerY;
+					}
+					result.push("X:"+pointerX+"Y:"+pointerY+"L:"+resultL);
+				}
+				console.log("going up");
+				console.log(wire2[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+	}
+	
+	//now that we have mapped it all out, let's re-trace things again and this time count out how many steps each time until a cross over.
+	
+	var crossLength = 0;
+	var bestCrossLength = 0;
+	var pointerXwire1 = 10000;
+	var pointerYwire1 = 10000;
+	var pointerXwire2 = 10000;
+	var pointerYwire2 = 10000;
+	var wire1pointer = 0;
+	var wire2pointer = 0;
+	
+	//wire1
+	do {
+	
+		//going right
+		if (wire1[wire1pointer].charAt(0) == "R") {
+			length = wire1[i].slice(1);
+			for (l = 0; l < length; l++) {
+				pointerXwire1++;
+				if (matrix[pointerXwire1][pointerYwire1] == 3) {
+					//wires have crossed -> start calulating wire2's length now.
+				}
+				
+				
+				console.log("going right");
+				console.log(wire1[i]);
+				console.log("pointerX: " + pointerX);
+				console.log("pointerY: " + pointerY);
+				console.log("matrix: " + matrix[pointerX][pointerY]);
+			}
+		}
+	
+	}
+	while (something);
+	
+	
+	document.getElementById("challenge2").innerHTML = "not yet coded";
+}
+
+</script>
