@@ -1,0 +1,96 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50">136760-595730</textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+
+//puzzle input is: 136760-595730
+//Do a big loop over the range of the value.  create a string variable based on the number.
+//check if each number is = or higher than the last number
+//check if double digits appear at least once.
+function challenge1() {
+	var input = document.getElementById("input").value;
+	
+	//ok just ignoring the input to cut corners...
+	var current = 136760;
+	var finish = 595730;
+	//var finish = 136800; //smaller test number
+	var numberString = "";
+	var doubleNum = false;
+	var goodNum = false;
+	result = 0;
+	var returnArray = [];
+	
+	while (current < finish) {
+		//reset variables
+		doubleNum = false;
+		goodNum = true;
+		//turn the current number into a string
+		numberString = current.toString();
+		for (i=1; i < 6; i++) {
+			//check for double number
+			if (numberString[i] == numberString[i-1]) {
+				doubleNum = true;
+			}
+			//check to ensure previous number less than or equal to current number
+			if (numberString[i] < numberString[i-1]) {
+				goodNum = false;
+			}
+		}
+		if (goodNum == true && doubleNum == true) {
+			console.log(numberString);
+			returnArray.push(numberString);
+			result++;
+		}
+		current++;
+	}
+	
+	//answer is: 1873
+	document.getElementById("challenge1").innerHTML = result;
+	return(returnArray);
+}
+
+
+
+function challenge2() {
+	var input = challenge1();
+	console.log("Beginning Challenge 2");
+	var numberString = "";
+	var result = 0;
+	
+	//work through array from answer 1, find all answers which qualify for challenge 2.
+	//count how many of each number there is, only keep answers that have 2x of a number.
+	
+	for (i=0; i < input.length; i++) {
+		//var numberTrack[0,0,0,0,0,0,0,0,0,0] //0-9 for how many times they appear
+		var correct = false;
+		numberString = input[i].toString();
+		console.log("checking: "+numberString);
+		//for numbers 0-9
+		for (x=0; x < 10; x++) {
+			var count = 0;
+			for (y=0; y < numberString.length; y++) {
+				if (numberString[y] == x) {
+					count++;
+				}
+			}
+			//numberTrack[x] = count;
+			if (count == 2) {
+				console.log(numberString);
+				correct = true;
+			}
+		}
+		if (correct == true) {
+			result++;
+		}
+	}
+	
+	document.getElementById("challenge2").innerHTML = result;
+}
+
+</script>
