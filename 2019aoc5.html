@@ -1,0 +1,304 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+//function:
+//code1 Add - code1(code, var1, var2, dest)
+//code2 Times - '
+//code3 Input - code3(code, dest)
+//code4 Output - code4(code
+//code99 Stop <- probably no need to make this a function.
+
+//or
+
+//find command.
+//parse command
+//easier I guess, for now...
+
+
+
+
+function challenge1() {
+	var input = document.getElementById("input").value.split(",");
+	//make the input numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var pointer = 0; // To track where we are up to in the opcode
+	var stop = false;
+	var command = "";
+	
+	
+	do {
+		//first figure out what the program wants to do for this instrustion.
+		command = input[pointer].toString();
+	
+		// addition or multiplication
+		if (command[command.length -1] == 1 || command[command.length -1] == 2) {
+			//figure out what values we should be using.
+			
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//Doing addition
+			if (command[command.length -1] == 1) {
+				var amount = par1 + par2;
+			}
+			else {
+				var amount = par1 * par2;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				input[pointer+3] = amount;
+			}
+			else {
+				input[input[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+
+		//the input step
+		else if (command[command.length -1] == 3) {
+			//for now the input is always 1, but maybe in the future this will change
+			input[input[pointer+1]] = 1;
+			//log this to console, in-case of un-expected extra inputs...
+			console.log("input entered!");
+			pointer = pointer + 2;
+		}
+		
+		//output step
+		//note can be 104, so need ot look out for this.
+		else if (command[command.length -1] == 4) {
+			//if same location
+			if  (command[command.length -3] == 1) {
+				var result = input[pointer+1];
+				console.log(input[pointer+1]);
+			}
+			else {
+				var result = input[input[pointer+1]];
+				console.log(input[input[pointer+1]]);
+			}
+			pointer = pointer + 2;
+		}
+		
+		else if (command == "99") {
+			stop = true;
+		}
+		else {
+			stop = true;
+			rest = "error :|";
+		}
+	}
+	while (stop == false);
+	
+	
+	//testing:
+	/*
+	command = input[pointer].toString();
+	if (command[command.length -3] == 1) {
+		console.log("true");
+	}
+	else {
+		console.log("false");
+	}*/
+	
+	//answer was: 16225258
+	document.getElementById("challenge1").innerHTML = result;
+}
+
+//===================================================
+
+function challenge2() {
+	//copy/paste of challenge 1, then modified for new needs (that will teach me for not using functions..)
+	var input = document.getElementById("input").value.split(",");
+	//make the input numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var pointer = 0; // To track where we are up to in the opcode
+	var stop = false;
+	var command = "";
+	
+	
+	do {
+		//first figure out what the program wants to do for this instrustion.
+		command = input[pointer].toString();
+	
+		// addition or multiplication
+		if (command[command.length -1] == 1 || command[command.length -1] == 2) {
+			//figure out what values we should be using.
+			
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//Doing addition
+			if (command[command.length -1] == 1) {
+				var amount = par1 + par2;
+			}
+			else {
+				var amount = par1 * par2;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				input[pointer+3] = amount;
+			}
+			else {
+				input[input[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+
+		//the input step
+		else if (command[command.length -1] == 3) {
+			//here is the input, for now using static values
+			input[input[pointer+1]] = 5; //<----------------------modify input here
+			//log this to console, in-case of un-expected extra inputs...
+			console.log("input entered!");
+			pointer = pointer + 2;
+		}
+		
+		//output step
+		//note can be 104, so need ot look out for this.
+		else if (command[command.length -1] == 4) {
+			//if same location
+			if  (command[command.length -3] == 1) {
+				var result = input[pointer+1];
+				console.log(input[pointer+1]);
+			}
+			else {
+				var result = input[input[pointer+1]];
+				console.log(input[input[pointer+1]]);
+			}
+			pointer = pointer + 2;
+		}
+		
+		//the weird jump-if-true commands
+		else if (command[command.length -1] == 5 || command[command.length -1] == 6) {
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//are we jumping?
+			if ((command[command.length -1] == 5 && par1 != 0) || (command[command.length -1] == 6 && par1 == 0)) {
+				//yes
+				pointer = par2;
+			}
+			else {
+				//no
+				pointer = pointer + 3;
+			}
+		}
+		
+		//the true / false check writers
+		else if (command[command.length -1] == 7 || command[command.length -1] == 8) {
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//Do the checks, all in the if command
+			if ((command[command.length -1] == 7 && par1 < par2) || (command[command.length -1] == 8 && par1 == par2)) {
+				var amount = 1;
+			}
+			else {
+				var amount = 0;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				input[pointer+3] = amount;
+			}
+			else {
+				input[input[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+		
+		//the end program
+		else if (command == "99") {
+			stop = true;
+		}
+		
+		//the something screwed up
+		else {
+			stop = true;
+			rest = "error :|";
+		}
+	}
+	while (stop == false);
+	
+	
+	/*
+	//testing:
+	command = input[pointer].toString();
+	//if (command[command.length -3] > 0 || command[command.length -3] < 0) { <- works for 5
+	//if (command[command.length -3] == 0 || command.length < 3) { <- works for 6
+		console.log("true");
+	}
+	else {
+		console.log("false");
+	}
+	*/
+	
+	document.getElementById("challenge2").innerHTML = result;
+	
+	//5629499534213120 is too high!
+	//Correct answer is: 2808771
+}
+
+</script>
