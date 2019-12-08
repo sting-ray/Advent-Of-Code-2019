@@ -1,0 +1,581 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+//turn the op computer into function now so that it can be used properly:
+
+
+//input and userInput expect arrays
+function computer(input, userInput) {
+	//copy/paste of challenge 1, then modified for new needs (that will teach me for not using functions..)
+	//var input = code.split(",");
+	//make the input numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var pointer = 0; // To track where we are up to in the opcode
+	var stop = false;
+	var command = "";
+	
+	
+	do {
+		//first figure out what the program wants to do for this instrustion.
+		command = input[pointer].toString();
+	
+		// addition or multiplication
+		if (command[command.length -1] == 1 || command[command.length -1] == 2) {
+			//figure out what values we should be using.
+			
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//Doing addition
+			if (command[command.length -1] == 1) {
+				var amount = par1 + par2;
+			}
+			else {
+				var amount = par1 * par2;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				input[pointer+3] = amount;
+			}
+			else {
+				input[input[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+
+		//the input step
+		else if (command[command.length -1] == 3) {
+			if  (command[command.length -3] == 1) {
+				input[pointer+1] = userInput[0];
+				//after we have taken the first input, remove it
+				userInput.shift();
+			}
+			else {
+				input[input[pointer+1]] = userInput[0];
+				userInput.shift();
+			}
+			pointer = pointer + 2;
+		}
+		
+		//output step
+		//note can be 104, so need ot look out for this.
+		else if (command[command.length -1] == 4) {
+			//if same location
+			if  (command[command.length -3] == 1) {
+				var result = input[pointer+1];
+			}
+			else {
+				var result = input[input[pointer+1]];
+			}
+			pointer = pointer + 2;
+		}
+		
+		//the weird jump-if-true commands
+		else if (command[command.length -1] == 5 || command[command.length -1] == 6) {
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//are we jumping?
+			if ((command[command.length -1] == 5 && par1 != 0) || (command[command.length -1] == 6 && par1 == 0)) {
+				//yes
+				pointer = par2;
+			}
+			else {
+				//no
+				pointer = pointer + 3;
+			}
+		}
+		
+		//the true / false check writers
+		else if (command[command.length -1] == 7 || command[command.length -1] == 8) {
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = input[pointer+1];
+			}
+			else {
+				var par1 = input[input[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = input[pointer+2];
+			}
+			else {
+				var par2 = input[input[pointer+2]];
+			}
+			
+			//Do the checks, all in the if command
+			if ((command[command.length -1] == 7 && par1 < par2) || (command[command.length -1] == 8 && par1 == par2)) {
+				var amount = 1;
+			}
+			else {
+				var amount = 0;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				input[pointer+3] = amount;
+			}
+			else {
+				input[input[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+		
+		//the end program
+		else if (command == "99") {
+			stop = true;
+		}
+		
+		//the something screwed up
+		else {
+			stop = true;
+			console.log("intcode computer error :|");
+		}
+	}
+	while (stop == false);
+	return result;
+}
+
+
+
+function challenge1() {
+	var input = document.getElementById("input").value.split(",");
+	//ok, could do this the dumb way, increment and then make sure no duplicates
+	//var phase = "01234";
+	var result = 0;
+	var phase = [0,1,2,3,4];
+
+	do {
+		//loop to find the next combination to try.
+		do {
+			var carry = true;
+			duplicate = false;
+			
+			//advance up the numbers
+			for (i = 4; i >= 0; i--) {
+				var checker = phase[i];
+				phase[i] = 9; // take it out for a moment
+				if (checker == 4) {
+					checker = 0;
+				}
+				else {
+					checker++;
+					phase[i] = checker;
+					break;
+				}
+				phase[i] = checker;
+			}
+			
+			//check for duplicates
+			for (i = 0; i < 5; i++) {
+				var count = 0;
+				for (a = 0; a < 5; a++) {
+					if (phase[a] == i) {
+						count++;
+					}
+				}
+				if (count < 1) {
+					duplicate = true;
+				}
+			}
+		}
+		while (duplicate == true);
+		
+		//run the computer code and then compare to see if highest value.
+		var signal = 0;
+		console.log(phase);
+		for (var amp = 0; amp < 5; amp++) {
+			signal = computer(input, [phase[amp],signal]);
+		}
+		console.log(signal);
+		
+		//is this the largest signal?
+		if (signal > result) {
+			result = signal;
+		}
+		
+		//have we tried all numbers, should the loop stop?
+		var stop = false;
+		if (phase[0] == 0 && phase[1] == 1 && phase[2] == 2 && phase[3] == 3 && phase[4] == 4) {
+			stop = true;
+		}
+		
+		
+	} //once we get back to 0,1,2,3,4 we stop
+	while (stop == false);
+	//not sure why this didn't work?: while (phase[0] != 0 && phase[1] != 1 && phase[2] != 2 && phase[3] != 3 && phase[4] != 4);
+	
+	document.getElementById("challenge1").innerHTML = result;
+	
+	//answer was: 206580
+}
+
+
+//=============================================================================
+
+
+//new improved upgraded computer ready for challenge 2.
+function computerMk2(program, userInput, pointer) {
+
+	//make the program numbers and not strings
+	//for(var i=0; i<program.length; i++) { program[i] = parseInt(program[i]); } 
+	//var pointer = 0; // To track where we are up to in the opcode <-- now given externally
+	var stop = "no";
+	var command = "";
+	var result = 0;
+	//console.log(program);
+	
+	do {
+		//first figure out what the program wants to do for this instrustion.
+		command = program[pointer].toString();
+	
+		// addition or multiplication
+		if (command[command.length -1] == 1 || command[command.length -1] == 2) {
+			//console.log("add or mult");
+			//console.log(pointer);
+			//console.log(program);
+			//figure out what values we should be using.
+			
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = program[pointer+1];
+			}
+			else {
+				var par1 = program[program[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = program[pointer+2];
+			}
+			else {
+				var par2 = program[program[pointer+2]];
+			}
+			
+			//Doing addition
+			if (command[command.length -1] == 1) {
+				var amount = par1 + par2;
+			}
+			else {
+				var amount = par1 * par2;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				program[pointer+3] = amount;
+			}
+			else {
+				program[program[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+
+		//the input step
+		else if (command[command.length -1] == 3) {
+			//console.log("input");
+			//console.log(userInput[0]);
+			//console.log(pointer);
+			//console.log(program);
+			
+			//If we need input and there is none, stop program.
+			if (userInput.length == 0) {
+				stop = "inputNeeded";
+			}
+			else  {
+				if  (command[command.length -3] == 1) {
+					//console.log("if");
+					program[pointer+1] = userInput[0];
+					//after we have taken the first input, remove it
+					userInput.shift();
+				}
+				else {
+					//console.log("else");
+					//console.log(program[program[pointer+1]]);
+					//console.log(program[1]);
+					program[program[pointer+1]] = userInput[0];
+					userInput.shift();
+				}
+				pointer = pointer + 2;
+			}
+		}
+		
+		//output step
+		//note can be 104, so need ot look out for this.
+		else if (command[command.length -1] == 4) {
+			//console.log("output");
+			//console.log(pointer);
+			//console.log(program);
+			//if same location
+			if  (command[command.length -3] == 1) {
+				result = program[pointer+1];
+				//stop = "output";
+				//console.log("output1 is:");
+				//console.log(result);
+			}
+			else {
+				result = program[program[pointer+1]];
+				//stop = "output";
+				//console.log("output2 is:");
+				//console.log(result);
+				//console.log(program);
+			}
+			pointer = pointer + 2;
+		}
+		
+		//the weird jump-if-true commands
+		else if (command[command.length -1] == 5 || command[command.length -1] == 6) {
+			//console.log("pointer jump commands");
+			//console.log(pointer);
+			//console.log(program);
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = program[pointer+1];
+			}
+			else {
+				var par1 = program[program[pointer+1]];
+			}
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = program[pointer+2];
+			}
+			else {
+				var par2 = program[program[pointer+2]];
+			}
+			
+			//are we jumping?
+			if ((command[command.length -1] == 5 && par1 != 0) || (command[command.length -1] == 6 && par1 == 0)) {
+				//yes
+				pointer = par2;
+			}
+			else {
+				//no
+				pointer = pointer + 3;
+			}
+		}
+		
+		//the true / false check writers
+		else if (command[command.length -1] == 7 || command[command.length -1] == 8) {
+			//console.log("1/0 writing commands");
+			//console.log(pointer);
+			//console.log(program);
+			//1st parameter, take it's value or does it point to where the value is?
+			if (command[command.length -3] == 1) {
+				var par1 = program[pointer+1];
+			}
+			else {
+				var par1 = program[program[pointer+1]];
+			}
+			
+			//2nd parameter, much the same
+			if (command[command.length -4] == 1) {
+				var par2 = program[pointer+2];
+			}
+			else {
+				var par2 = program[program[pointer+2]];
+			}
+			
+			//Do the checks, all in the if command
+			if ((command[command.length -1] == 7 && par1 < par2) || (command[command.length -1] == 8 && par1 == par2)) {
+				var amount = 1;
+			}
+			else {
+				var amount = 0;
+			}
+			
+			//where to store this varible?
+			if (command[command.length -5] == 1) {
+				program[pointer+3] = amount;
+			}
+			else {
+				program[program[pointer+3]] = amount;
+			}
+			
+			pointer = pointer + 4;
+		}
+		
+		//the end program
+		else if (command == "99") {
+			//console.log("ending program");
+			//console.log(pointer);
+			//console.log(program);
+			stop = "end";
+		}
+		
+		//the something screwed up
+		else {
+			stop = "error";
+			//console.log("intcode computer error :|");
+			//console.log(pointer);
+			//console.log(program);
+		}
+	}
+	while (stop == "no");
+	
+	return [program, result, stop, pointer]
+	//return result;
+}
+//computerMk2()
+//input: program[], 1st run: userInput[phase, signal] 2nd run userInput[signal], pointer
+//output: 0program, 1signal, 2stop, 3pointer -- stops: inputNeeded, end, error, no (no, shouldn't happen...)
+
+
+//runComputerMk2(phase);
+//returns: signal
+
+function runComputerMk2(phase, input) {
+	var signal = 0;
+	var amp = [];
+	var stopComputer = false;
+	
+	//seed inital values into the amps
+	for (i=0; i < 5; i++) {
+		amp[i] = []
+		amp[i][0] = [];
+		for (a=0; a < input.length; a++) {
+			amp[i][0].push(input[a]);
+		}
+		amp[i][1] = 0;
+		amp[i][2] = "";
+		amp[i][3] = 0;
+	}
+	
+	
+	//run through the amps doing the calculations
+	//on the first run we pass in phase and signal
+	for (i=0; i < 5; i++) {
+		amp[i] = computerMk2(amp[i][0], [phase[i],signal], amp[i][3]);
+		signal = amp[i][1];
+	}
+	
+	//continue to loop through until we hit an end signal.
+	//We only feed in a signal now, no phase
+	//we check for an end or error signal
+	do {
+		for (i=0; i < 5; i++) {
+			amp[i] = computerMk2(amp[i][0], [signal], amp[i][3]);
+			signal = amp[i][1];
+			if (amp[i][2] == "end" || amp[i][2] == "error") {
+				stopComputer = true;
+			}
+		}
+		
+		
+	}
+	while (stopComputer == false);
+	return(signal);
+}
+
+
+
+
+function challenge2() {
+	var input = document.getElementById("input").value.split(",");
+	//make the input an array of numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	var phase = [5,6,7,8,9];
+	var result = 0;
+	
+	do {
+		//loop to find the next combination to try.
+		do {
+			var carry = true;
+			duplicate = false;
+			
+			//advance up the numbers
+			for (i = 4; i >= 0; i--) {
+				var checker = phase[i];
+				phase[i] = 1; // take it out for a moment
+				if (checker == 9) {
+					checker = 5;
+				}
+				else {
+					checker++;
+					phase[i] = checker;
+					break;
+				}
+				phase[i] = checker;
+			}
+			
+			//check for duplicates
+			for (i = 5; i < 10; i++) {
+				var count = 0;
+				for (a = 0; a < 5; a++) {
+					if (phase[a] == i) {
+						count++;
+					}
+				}
+				if (count < 1) {
+					duplicate = true;
+				}
+			}
+		}
+		while (duplicate == true);
+		
+		//run the computer code and then compare to see if highest value.
+		console.log("running computer");
+		var signal = 0;
+		console.log(phase);
+
+		for (var amp = 0; amp < 5; amp++) {
+			signal = runComputerMk2(phase, input);
+		}
+		console.log(signal);
+		
+		//is this the largest signal?
+		if (signal > result) {
+			result = signal;
+		}
+		
+		//have we tried all numbers, should the loop stop?
+		var stop = false;
+		if (phase[0] == 9 && phase[1] == 8 && phase[2] == 7 && phase[3] == 6 && phase[4] == 5) {
+			stop = true;
+		}
+		
+		
+	}
+	while (stop == false);
+	
+
+	document.getElementById("challenge2").innerHTML = result;
+	//answer was: 2299406
+}
+
+</script>
