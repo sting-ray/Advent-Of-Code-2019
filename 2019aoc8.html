@@ -1,0 +1,114 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+function challenge1() {
+	var input = document.getElementById("input").value;
+	var pointer = 0;
+	console.log(input.length);
+	
+	
+	//there are 100 layers...
+	//find the layer with the most i's...
+	for (l=0; l < 100; l++) {
+		var num0 = 0;
+		var num1 = 0;
+		var num2 = 0;
+		
+		for (i = pointer; i < pointer + 150; i++) {
+			if (input[i] == 0) {
+				num0++;
+			}
+			else if (input[i] == 1) {
+				num1++;
+			}
+			else if (input[i] == 2) {
+				num2++;
+			}
+		}
+		pointer = pointer + 150;
+		
+		console.log("layer:" + l);
+		console.log("0s: " + num0);
+		console.log("1s: " + num1);
+		console.log("2s: " + num2);
+		
+	}
+
+	
+	var result = "see console...";
+	//answer was: 2,520
+	
+
+	document.getElementById("challenge1").innerHTML = result;
+}
+
+
+
+function challenge2() {
+	var input = document.getElementById("input").value;
+	var pointer = 0;
+	
+	//there are 100 layers...
+	//create a master image and iterate over that many times.
+	var image = [];
+	
+	for (i = 0; i < 150; i++) {
+		image[i] = 2;
+	}
+	
+	//now iterate
+	for (l=0; l < 100; l++) {
+		
+		for (i = pointer; i < pointer + 150; i++) {
+			if (input[i] == 0 && image[i - pointer] == 2) {
+				image[i - pointer] = 0;
+			}
+			else if (input[i] == 1 && image[i - pointer] == 2) {
+				image[i - pointer] = 1;
+			}
+			else if (input[i] == 2 && image[i - pointer] == 2) {
+				//do nothing
+			}
+		}
+		pointer = pointer + 150;	
+	}
+	
+	//now to create some breaklines
+	/*
+	for (i=6; i >= 0; i--) {
+		image.splice(i * 25, 0, "\n");
+	}
+	
+	//make our image
+	var result = image.join();
+	console.log(image);*/
+	
+	//Now lets see the image:
+	var pointer = 0;
+	var string = "";
+	for (h=0; h < 6; h++) {
+		for (w=0; w < 25; w++) {
+			if (image[pointer] == 1) {
+				string += "<font color='red'>0</font>";
+			}
+			else {
+				string += "<mark>0</mark>";
+			}
+			pointer++;
+		}
+		string += "<br>";
+	}
+	
+	
+	document.getElementById("challenge2").innerHTML = string;
+	//answer was: LEGJY
+}
+
+</script>
