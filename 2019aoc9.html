@@ -1,0 +1,183 @@
+<html>
+<body>
+Enter in the challenge input:<br>
+<textarea name="input" id="input" rows = "10" cols="50"></textarea><br>
+<button onclick="challenge1()">Challenge 1</button><br>
+<div id="challenge1"></div><br>
+<button onclick="challenge2()">Challenge 2</button><br>
+<div id="challenge2"></div><br>
+
+<script>
+
+//computer()
+//input: program[], 1st run: userInput[phase, signal] 2nd run userInput[signal], pointer
+//output: 0program[], 1outputs[], 2stop, 3pointer -- stops: inputNeeded, end, error, no (no, shouldn't happen...)
+function computer(program, userInput = [], pointer = 0) {
+	
+	//Create a paramater value
+	//cmd type = number of digits that should be looked backwards for the param type.
+	function makePar(cmdType) {
+		if (command[command.length - cmdType - 2] == 1) {
+			var par = program[pointer + cmdType];
+		}
+		else if (command[command.length - cmdType - 2] == 2) {
+			var par = program[relativeBase + program[pointer+cmdType]];
+		}
+		else {
+			var par = program[program[pointer + cmdType]];
+		}
+		//if it attempted to access non existent memory, give value 0.
+		if  (par === undefined) {
+			par = 0;
+		}
+		return par;
+	}
+	
+	function writePar(amount, cmdType) {
+		if (command[command.length - cmdType - 2] == 1) {
+			program[pointer + cmdType] = amount;
+		}
+		else if (command[command.length - cmdType - 2] == 2) {
+			program[relativeBase + program[pointer + cmdType]] = amount;
+		}
+		else {
+			program[program[pointer + cmdType]] = amount;
+		}
+	}
+	
+	
+	//make the program numbers and not strings
+	//for(var i=0; i<program.length; i++) { program[i] = parseInt(program[i]); } 
+	var stop = "no";
+	var command = "";
+	var result = 0;
+	var relativeBase = 0;
+	var result = [];
+	
+	do {
+		//first figure out what the program wants to do for this instrustion.
+		command = program[pointer].toString();
+		
+		//Then carry out the instrustion:
+		
+		//addition 1
+		if (command[command.length -1] == 1) {
+			writePar(makePar(1) + makePar(2),3);
+			pointer += 4;
+		}
+		
+		//mulitplication 2
+		else if (command[command.length -1] == 2) {
+			writePar(makePar(1) * makePar(2),3);
+			pointer += 4;
+		}
+
+		//input 3
+		else if (command[command.length -1] == 3) {
+			//If we need input and there is none, stop program.
+			if (userInput.length == 0) {
+				stop = "inputNeeded";
+			}
+			else  {
+				writePar(userInput[0], 1);
+				pointer += 2;
+			}
+		}
+		
+		//output 4
+		else if (command[command.length -1] == 4) {
+			var output = makePar(1)
+			result.push(output);
+			pointer +=  2;
+		}
+		
+		//jump-if-true 5 & 6
+		else if (command[command.length -1] == 5 || command[command.length -1] == 6) {
+			//get paramaters
+			var par1 = makePar(1);
+			var par2 = makePar(2);
+			
+			//are we jumping?
+			if ((command[command.length -1] == 5 && par1 != 0) || (command[command.length -1] == 6 && par1 == 0)) {
+				//yes
+				pointer = par2;
+			}
+			else {
+				//no
+				pointer += 3;
+			}
+		}
+		
+		//true or false 7 & 8
+		else if (command[command.length -1] == 7 || command[command.length -1] == 8) {
+			//get paramaters
+			var par1 = makePar(1);
+			var par2 = makePar(2);
+			
+			//Do the checks, all in the if command
+			if ((command[command.length -1] == 7 && par1 < par2) || (command[command.length -1] == 8 && par1 == par2)) {
+				var amount = 1;
+			}
+			else {
+				var amount = 0;
+			}
+			
+			//where to store this varible?
+			writePar(amount, 3)
+			
+			pointer += 4;
+		}
+		
+		
+		//relativeBase offset command 09
+		else if ((command[command.length - 2] == 0 || command[command.length - 2] == undefined)&& command[command.length -1] == 9) {
+			relativeBase = relativeBase + makePar(1);
+			pointer += 2;
+		}
+		
+		//the end program
+		else if (command == "99") {
+			stop = "end";
+		}
+		
+		//the something screwed up
+		else {
+			stop = "error";
+			console.log("pointer location: " + pointer);
+			console.log(program);
+		}
+	}
+	while (stop == "no");
+	
+	return [program, result, stop, pointer]
+	//return result;
+}
+
+
+function challenge1() {
+	document.getElementById("challenge1").innerHTML = "processing day 9 challenge1";
+	
+	var input = document.getElementById("input").value.split(",");
+	//make the input an array of numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	
+	var result = computer(input, [1], 0);
+	document.getElementById("challenge1").innerHTML = result[1];
+	//answer was: 3638931938
+}
+
+
+
+function challenge2() {
+	document.getElementById("challenge2").innerHTML = "processing day 9 challenge1";
+	
+	var input = document.getElementById("input").value.split(",");
+	//make the input an array of numbers and not strings
+	for(var i=0; i<input.length; i++) { input[i] = parseInt(input[i]); } 
+	
+	var result = computer(input, [2], 0);
+	document.getElementById("challenge2").innerHTML = result[1];
+	//answer was: 86025
+}
+
+</script>
